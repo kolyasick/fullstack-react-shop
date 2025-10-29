@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+button,
+a,
+label {
+  @apply cursor-pointer;
+}

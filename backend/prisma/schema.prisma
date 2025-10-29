@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Roles {
+  ADMIN
+  USER
+}
+
+model User {
+  id Int @id @default(autoincrement())
+
+  uuid     String @unique @default(uuid()) @db.Uuid
+  username String
+  email    String @unique
+  password String
+  role     Roles
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  refreshToken RefreshToken[]
+  reviews      Review[]
+  cart         Cart?
+
+  @@index([id])
+}
+
+model RefreshToken {
+  id Int @id @default(autoincrement())
+
+  token String @unique
+
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  userId Int
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([id])
+}
+
+model Product {
+  id          Int     @id @default(autoincrement())
+  uuid        String  @unique @default(uuid()) @db.Uuid
+  title       String  @unique
+  price       Float
+  rating      Float
+  description String
+  imageUrl    String
+  inStock     Boolean
+  features    String
+
+
+  brandId    Int
+  categoryId Int
+
+  category Category @relation(fields: [categoryId], references: [id])
+  brand    Brand    @relation(fields: [brandId], references: [id])
+  reviews  Review[]
+  cartItem  CartItem?
+}
+
+model CartItem {
+  id          Int     @id @default(autoincrement())
+  qty         Int     @default(1)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  productId   Int     @unique   
+  cartId      Int     
+
+  product     Product @relation(fields: [productId],references: [id])
+  cart        Cart    @relation(fields: [cartId], references: [id])
+}
+
+model Cart {
+  id          Int     @id @default(autoincrement())
+  amount      Float
+  email       String
+  fullName    String
+  comment     String?
+  
+  userId      Int     @unique
+
+  user        User   @relation(fields: [userId], references: [id])
+  items       CartItem[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  title String @unique
+
+  products Product[]
+}
+
+model Brand {
+  id    Int    @id @default(autoincrement())
+  title String @unique
+
+  products Product[]
+}
+
+model Review {
+  id   Int    @id @default(autoincrement())
+  rate Int    @db.SmallInt
+  text String
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  userId    Int
+  productId Int
+
+  author  User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}

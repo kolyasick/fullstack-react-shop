@@ -1,0 +1,272 @@
+import { PrismaClient, Prisma } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
+
+const prisma = new PrismaClient().$extends(withAccelerate());
+
+const PRODUCTS = [
+  {
+    id: 1,
+    name: "iPhone 14 Pro",
+    category: "Смартфоны",
+    price: 999.99,
+    currency: "USD",
+    description:
+      "Флагманский смартфон с камерой 48 МП и процессором A16 Bionic",
+    image: "1.jpeg",
+    inStock: true,
+    rating: 2.3,
+    reviews: 1247,
+    features: ["5G", "Face ID", "120Hz дисплей", "Титан"],
+    brand: "Apple",
+    reviewList: [],
+  },
+  {
+    id: 2,
+    name: "Samsung Galaxy S23",
+    category: "Смартфоны",
+    price: 799.99,
+    currency: "USD",
+    description: "Мощный Android-смартфон с камерой 200 МП",
+    image: "2.jpeg",
+    inStock: true,
+    rating: 4.6,
+    reviews: 892,
+    features: ["5G", "Snapdragon 8 Gen 2", "120Hz AMOLED"],
+    brand: "Samsung",
+    reviewList: [],
+  },
+  {
+    id: 3,
+    name: "MacBook Air M2",
+    category: "Ноутбуки",
+    price: 1199.99,
+    currency: "USD",
+    description: "Легкий и мощный ноутбук с чипом Apple M2",
+    image: "3.jpeg",
+    inStock: true,
+    rating: 4.9,
+    reviews: 567,
+    features: ['13.6" дисплей', "18 часов работы", "8GB RAM", "256GB SSD"],
+    brand: "Apple",
+    reviewList: [],
+  },
+  {
+    id: 4,
+    name: "Sony WH-1000XM4",
+    category: "Наушники",
+    price: 349.99,
+    currency: "USD",
+    description: "Беспроводные наушники с шумоподавлением",
+    image: "4.jpeg",
+    inStock: false,
+    rating: 4.7,
+    reviews: 2341,
+    features: ["Шумоподавление", "30 часов работы", "Сенсорное управление"],
+    brand: "Sony",
+    reviewList: [],
+  },
+  {
+    id: 5,
+    name: "iPad Air 5",
+    category: "Планшеты",
+    price: 599.99,
+    currency: "USD",
+    description: "Универсальный планшет с чипом M1",
+    image: "5.jpeg",
+    inStock: true,
+    rating: 4.5,
+    reviews: 678,
+    features: ['10.9" дисплей', "Support Apple Pencil", "5G"],
+    brand: "Apple",
+    reviewList: [],
+  },
+  {
+    id: 6,
+    name: "PlayStation 5",
+    category: "Игровые консоли",
+    price: 499.99,
+    currency: "USD",
+    description: "Новейшая игровая консоль от Sony",
+    image: "6.jpeg",
+    inStock: true,
+    rating: 4.8,
+    reviews: 1890,
+    features: ["4K Gaming", "SSD", "DualSense контроллер"],
+    brand: "Sony",
+    reviewList: [],
+  },
+  {
+    id: 7,
+    name: "Dell XPS 13",
+    category: "Ноутбуки",
+    price: 999.99,
+    currency: "USD",
+    description: "Компактный ультрабук с безрамочным дисплеем",
+    image: "7.jpeg",
+    inStock: true,
+    rating: 4.4,
+    reviews: 445,
+    features: ['13.4" дисплей', "Intel i7", "16GB RAM", "512GB SSD"],
+    brand: "Dell",
+    reviewList: [],
+  },
+  {
+    id: 8,
+    name: "AirPods Pro 2",
+    category: "Наушники",
+    price: 249.99,
+    currency: "USD",
+    description: "Беспроводные наушники с активным шумоподавлением",
+    image: "8.jpeg",
+    inStock: true,
+    rating: 4.6,
+    reviews: 1567,
+    features: ["Шумоподавление", "Пространственное аудио", "6 часов работы"],
+    brand: "Apple",
+    reviewList: [],
+  },
+  {
+    id: 9,
+    name: "Apple Watch Series 9",
+    category: "Смарт-часы",
+    price: 399.99,
+    currency: "USD",
+    description: "Умные часы с расширенными функциями здоровья",
+    image: "9.webp",
+    inStock: true,
+    rating: 4.7,
+    reviews: 892,
+    features: ["ЭКГ", "GPS", "Водонепроницаемость", "Always-On дисплей"],
+    brand: "Apple",
+    reviewList: [],
+  },
+  {
+    id: 10,
+    name: "Nintendo Switch OLED",
+    category: "Игровые консоли",
+    price: 349.99,
+    currency: "USD",
+    description: "Гибридная игровая консоль с OLED-экраном",
+    image: "10.jpeg",
+    inStock: true,
+    rating: 4.6,
+    reviews: 1563,
+    features: ["OLED дисплей", "HD Rumble", "Portable режим"],
+    brand: "Nintendo",
+    reviewList: [],
+  },
+  {
+    id: 11,
+    name: "Canon EOS R6",
+    category: "Фотоаппараты",
+    price: 2499.99,
+    currency: "USD",
+    description: "Беззеркальная камера для профессионалов",
+    image: "11.jpeg",
+    inStock: true,
+    rating: 4.8,
+    reviews: 423,
+    features: ["20 МП", "4K видео", "Стабилизация", "Wi-Fi"],
+    brand: "Canon",
+    reviewList: [],
+  },
+  {
+    id: 12,
+    name: "Bose QuietComfort 45",
+    category: "Наушники",
+    price: 329.99,
+    currency: "USD",
+    description: "Наушники с премиальным шумоподавлением",
+    image: "12.jpeg",
+    inStock: true,
+    rating: 4.5,
+    reviews: 987,
+    features: ["Шумоподавление", "22 часа работы", "Quick Charge"],
+    brand: "Bose",
+    reviewList: [],
+  },
+];
+
+const BRANDS = [
+  "Apple",
+  "Samsung",
+  "Sony",
+  "Dell",
+  "Nintendo",
+  "Canon",
+  "Bose",
+];
+
+const CATEGORIES = [
+  "Смартфоны",
+  "Ноутбуки",
+  "Наушники",
+  "Планшеты",
+  "Игровые консоли",
+  "Смарт-часы",
+  "Фотоаппараты",
+];
+
+async function up() {
+  await prisma.brand.createMany({
+    data: BRANDS.map((b) => ({ title: b })),
+  });
+
+  await prisma.category.createMany({
+    data: CATEGORIES.map((c) => ({ title: c })),
+  });
+
+  for (const p of PRODUCTS) {
+    await prisma.product.create({
+      data: {
+        title: p.name,
+        description: p.description,
+        features: p.features.join(", "),
+        imageUrl: p.image,
+        inStock: p.inStock,
+        price: p.price,
+        rating: p.rating,
+        brand: {
+          connect: {
+            title: p.brand,
+          },
+        },
+        category: {
+          connect: {
+            title: p.category,
+          },
+        },
+      },
+    });
+  }
+
+  await prisma.user.create({
+    data: {
+      email: "admin@mail.ru",
+      password: "123123",
+      role: "ADMIN",
+      username: "ADMIN",
+    },
+  });
+}
+
+async function down() {
+  await prisma.$executeRaw`TRUNCATE TABLE "Brand" RESTART IDENTITY CASCADE`;
+  await prisma.$executeRaw`TRUNCATE TABLE "Category" RESTART IDENTITY CASCADE`;
+  await prisma.$executeRaw`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE`;
+}
+
+async function main() {
+  await down();
+  await up();
+}
+
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
