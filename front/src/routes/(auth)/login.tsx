@@ -1,11 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+
+import { Link } from "react-router";
 import LoginForm from "../../components/shared/auth/login-form";
 
-export const Route = createFileRoute("/(auth)/login")({
-  component: Login,
-});
 
-function Login() {
+function LoginPage() {
   return (
     <div className="bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -44,3 +42,5 @@ function Login() {
     </div>
   );
 }
+
+export default LoginPage;

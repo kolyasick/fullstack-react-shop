@@ -1,42 +1,48 @@
-import React from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { useProductStore } from "../stores/product";
-
-import api from "../axios/config";
-
-import Filters from "../components/shared/filters";
+import Filters from "../components/shared/filters/filters";
 import EmptyProducts from "../components/shared/empty-products";
 import Loader from "../components/icons/loader";
 import ProductItem from "../components/shared/product-item";
 
-export const Route = createFileRoute("/")({
-  component: Index,
-});
+import { useProductStore } from "../stores/product";
+import { useEffect, useState } from "react";
+import api from "../axios/config";
+import type { Brand, Category } from "../types/product";
 
-function Index() {
+const IndexPage: React.FunctionComponent = () => {
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
   const { products, setProducts } = useProductStore();
-  const [loading, setLoading] = React.useState<boolean>(false);
 
-  const getProducts = async () => {
-    try {
-      setLoading(true);
-      const { data } = await api.get("/products");
-      setProducts(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const getProducts = async () => {
+      try {
+        setLoading(true);
+        const { data } = await api.get("/products");
+        if (data) setProducts(data);
+      } catch (error) {
+        console.log("Ошибка при получении продуктов: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  React.useEffect(() => {
-    getProducts();
+    const getBrands = () => {
+      api.get("/products/brands").then((res) => setBrands(res.data));
+    };
+    const getCategories = () => {
+      api.get("/products/categories").then((res) => setCategories(res.data));
+    };
+
+    Promise.all([getProducts(), getBrands(), getCategories()]);
   }, []);
-
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid gap-8" style={{ gridTemplateColumns: "1fr 3fr" }}>
-        <Filters />
+      <div
+        className="grid items-start gap-8"
+        style={{ gridTemplateColumns: "1fr 3fr" }}
+      >
+        <Filters brands={brands} categories={categories} />
 
         <div>
           <div className="flex items-center justify-between mb-8">
@@ -47,7 +53,7 @@ function Index() {
             <div className="flex items-center justify-center py-12">
               <Loader className="w-24 aspect-square animate-spin" />
             </div>
-          ) : true ? (
+          ) : products.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
               {products.map((p) => (
                 <ProductItem key={p.id} product={p} />
@@ -60,4 +66,6 @@ function Index() {
       </div>
     </div>
   );
-}
+};
+
+export default IndexPage;

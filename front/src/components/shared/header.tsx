@@ -1,4 +1,4 @@
-import { Link, useLocation } from "@tanstack/react-router";
+
 import HeaderSearchInput from "./header-search-input";
 
 import Account from "../icons/account";
@@ -7,9 +7,10 @@ import { useUserStore } from "../../stores/user";
 import Logout from "../icons/logout";
 import api from "../../axios/config";
 import { ACCESS_TOKEN_NAME } from "../../constants/app";
+import { Link, useLocation } from "react-router";
 
 const Header: React.FC = () => {
-  const { href } = useLocation();
+  const { pathname } = useLocation();
   const { user, setUser } = useUserStore();
 
   const logout = () => {
@@ -24,7 +25,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-gray-300 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
@@ -34,7 +35,7 @@ const Header: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-900">E-Shop</h1>
           </Link>
 
-          {href === "/" && <HeaderSearchInput />}
+          {pathname === "/" && <HeaderSearchInput />}
 
           <div className="flex items-center gap-2">
             <button className="p-2 text-gray-600 hover:text-blue-600 transition-colors relative">

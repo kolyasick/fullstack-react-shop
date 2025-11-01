@@ -1,19 +1,7 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { Link } from "react-router";
 import RegisterForm from "../../components/shared/auth/register-form";
-import { ACCESS_TOKEN_NAME } from "../../constants/app";
 
-export const Route = createFileRoute("/(auth)/register")({
-  component: Register,
-  beforeLoad: async () => {
-    if (localStorage.getItem(ACCESS_TOKEN_NAME)) {
-      throw redirect({
-        to: "/",
-      });
-    }
-  },
-});
-
-function Register() {
+function RegisterPage() {
   return (
     <div className=" bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -52,3 +40,5 @@ function Register() {
     </div>
   );
 }
+
+export default RegisterPage;

@@ -1,8 +1,8 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import api from "../../../axios/config";
 import React from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { useUserStore } from "../../../stores/user";
+import { useNavigate } from "react-router";
 
 type Form = {
   email: string;
@@ -35,7 +35,7 @@ const LoginForm = () => {
       if (authData.accessToken) {
         localStorage.setItem("e-shopToken", authData.accessToken);
         setUser(authData.user);
-        await navigate({ to: "/" });
+        await navigate("/");
       }
     } catch (error: any) {
       console.log(error.response.data.error.message || error);

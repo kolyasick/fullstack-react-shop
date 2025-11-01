@@ -1,10 +1,24 @@
 import { Request, Response } from "express";
 import { sendError } from "../utils/sendError";
-import { findAll, findBrands } from "../services/productService";
+import {
+  findAll,
+  findBrands,
+  findCategories,
+} from "../services/productService";
 
+type ProductQuery = {
+  q: string;
+  brand: string;
+  category: string;
+  priceFrom: string;
+  priceTo: string;
+  stock: "ALL" | "OUT_OF_STOCK" | "STOCK";
+  rating: string;
+};
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const products = await findAll();
+    const query = req.query as ProductQuery;
+    const products = await findAll(query);
 
     if (!products) {
       return sendError(res, 404, "Продукты не найдены");
@@ -12,6 +26,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
     res.status(200).json(products);
   } catch (error: any) {
+    console.log(error);
     sendError(res, 500, error.message || "Внутренняя ошибка сервера");
   }
 };
@@ -22,6 +37,20 @@ export const getBrands = async (req: Request, res: Response) => {
 
     if (!brands) {
       return sendError(res, 404, "Бренды не найдены");
+    }
+
+    res.status(200).json(brands);
+  } catch (error: any) {
+    sendError(res, 500, error.message || "Внутренняя ошибка сервера");
+  }
+};
+
+export const getCategories = async (req: Request, res: Response) => {
+  try {
+    const brands = await findCategories();
+
+    if (!brands) {
+      return sendError(res, 404, "Категории не найдены");
     }
 
     res.status(200).json(brands);

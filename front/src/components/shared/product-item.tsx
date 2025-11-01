@@ -1,7 +1,7 @@
-import { Link } from "@tanstack/react-router";
 import Cart from "../icons/cart";
 import type { Product } from "../../types/product";
 import React from "react";
+import { Link } from "react-router";
 
 type Props = {
   product: Product;
@@ -80,7 +80,9 @@ const ProductItem: React.FC<Props> = ({ product }) => {
 
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-2xl font-bold text-gray-900">499 $</span>
+            <span className="text-2xl font-bold text-gray-900">
+              {product.price} $
+            </span>
           </div>
 
           {false ? (

@@ -1,8 +1,14 @@
+import { useFilter } from "../../contexts/use-filters";
+
 const HeaderSearchInput: React.FunctionComponent = () => {
+  const { searchQuery, setSearchQuery } = useFilter();
+
   return (
     <div className="flex-1 max-w-md mx-4">
       <div className="relative">
         <input
+          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchQuery}
           type="text"
           placeholder="Поиск товаров..."
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

@@ -1,23 +1,37 @@
-import { StrictMode } from "react";
+import { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { routeTree } from "./routeTree.gen";
-
 import "./assets/main.css";
+import { RouterProvider } from "react-router";
+import router from "./routes";
+import { useUserStore } from "./stores/user";
+import api from "./axios/config";
 
-const router = createRouter({ routeTree });
 
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
+function AppWithAuth() {
+  const setUser = useUserStore((state) => state.setUser);
+
+  useEffect(() => {
+    const token = localStorage.getItem("e-shopToken");
+    if (!token) return;
+
+    api
+      .get("/profile", {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((res) => setUser(res.data.user))
+      .catch((error) => {
+        console.error("Auth error:", error);
+      });
+  }, []);
+
+  return <RouterProvider router={router} />;
 }
+
 const rootElement = document.getElementById("root")!;
+
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <StrictMode>
-      <RouterProvider router={router} />
-    </StrictMode>
-  );
+  root.render(<AppWithAuth />);
 }

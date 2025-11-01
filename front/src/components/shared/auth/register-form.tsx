@@ -3,7 +3,7 @@ import api from "../../../axios/config";
 import React from "react";
 import { useUserStore } from "../../../stores/user";
 import { ACCESS_TOKEN_NAME } from "../../../constants/app";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router";
 
 type Form = {
   username: string;
@@ -40,7 +40,7 @@ const RegisterForm = () => {
       if (authData.accessToken) {
         localStorage.setItem(ACCESS_TOKEN_NAME, authData.accessToken);
         setUser(authData.user);
-        await navigate({ to: "/" });
+        await navigate("/");
       }
     } catch (error: any) {
       console.log(error.response.data.error.message || error);
