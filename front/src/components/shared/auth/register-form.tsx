@@ -4,6 +4,7 @@ import React from "react";
 import { useUserStore } from "../../../stores/user";
 import { ACCESS_TOKEN_NAME } from "../../../constants/app";
 import { useNavigate } from "react-router";
+import { useCartStore } from "../../../stores/cart";
 
 type Form = {
   username: string;
@@ -27,6 +28,7 @@ const RegisterForm = () => {
   const [authError, setAuthError] = React.useState<null | string>(null);
   const [loading, setLoading] = React.useState<boolean>(false);
   const { setUser } = useUserStore();
+  const { setCart } = useCartStore();
   const onSubmit: SubmitHandler<Form> = async (data) => {
     try {
       setAuthError(null);
@@ -40,6 +42,9 @@ const RegisterForm = () => {
       if (authData.accessToken) {
         localStorage.setItem(ACCESS_TOKEN_NAME, authData.accessToken);
         setUser(authData.user);
+
+        const { data: cart } = await api.post("/cart/initalize");
+        setCart(cart);
         await navigate("/");
       }
     } catch (error: any) {

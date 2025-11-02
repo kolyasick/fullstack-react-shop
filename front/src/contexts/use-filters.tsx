@@ -8,14 +8,18 @@ import React, {
 import type { PriceRange, Stock } from "../types/filters";
 import { useSet } from "react-use";
 import type { Brand, Category } from "../types/product";
+import { useLocation } from "react-router";
 
-interface FilterContextType {
+interface FilterState {
   category: string;
   selectedBrands: Set<string>;
   priceRange: PriceRange;
   stock: Stock;
   rating: number;
   searchQuery: string;
+}
+
+interface FilterActions {
   updatePriceRange: (key: keyof PriceRange, value: number) => void;
   setCategory: React.Dispatch<React.SetStateAction<string>>;
   setStock: React.Dispatch<React.SetStateAction<Stock>>;
@@ -25,23 +29,39 @@ interface FilterContextType {
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const FilterContext = createContext<FilterContextType | undefined>(undefined);
-
-interface FilterProviderProps {
+type FilterProviderProps = {
   children: ReactNode;
-}
+};
+
+const FilterStateContext = createContext<FilterState | undefined>(undefined);
+const FilterActionsContext = createContext<FilterActions | undefined>(
+  undefined
+);
 
 export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [category, setCategory] = useState<Category["title"]>("");
+  const location = useLocation();
+  const urlParams = new URLSearchParams(location.search);
+
+  const [searchQuery, setSearchQuery] = useState(urlParams.get("q") || "");
+  const [category, setCategory] = useState<Category["title"]>(
+    urlParams.get("category") || ""
+  );
   const [selectedBrands, { toggle: setBrand, clear: clearSelectedBrands }] =
-    useSet(new Set<Brand["title"]>([]));
+    useSet(
+      new Set<Brand["title"]>(
+        Array.from(urlParams.get("brand")?.split(", ") || [])
+      )
+    );
   const [priceRange, setPriceRange] = useState<PriceRange>({
-    priceFrom: 0,
-    priceTo: 1000,
+    priceFrom: Number(urlParams.get("priceFrom") || 0),
+    priceTo: Number(urlParams.get("priceTo") || 1000),
   });
-  const [stock, setStock] = useState<Stock>("ALL");
-  const [rating, setRating] = useState<number>(1);
+  const [stock, setStock] = useState<Stock>(
+    (urlParams.get("stock") as Stock) || "ALL"
+  );
+  const [rating, setRating] = useState<number>(
+    Number(urlParams.get("rating") || 1)
+  );
 
   const updatePriceRange = (key: keyof PriceRange, value: number) => {
     setPriceRange((prev) => ({ ...prev, [key]: value }));
@@ -57,14 +77,21 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
     setStock("ALL");
     setRating(1);
   };
-  const value = useMemo(
-    () => ({
+
+  const state = useMemo(
+    (): FilterState => ({
       category,
       selectedBrands,
       priceRange,
       stock,
       rating,
       searchQuery,
+    }),
+    [category, selectedBrands, priceRange, stock, rating, searchQuery]
+  );
+
+  const actions = useMemo(
+    (): FilterActions => ({
       updatePriceRange,
       setCategory,
       setStock,
@@ -73,18 +100,41 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
       setBrand,
       setSearchQuery,
     }),
-    [searchQuery, category, selectedBrands, priceRange, stock, rating]
+    []
   );
 
   return (
-    <FilterContext.Provider value={value}>{children}</FilterContext.Provider>
+    <FilterStateContext.Provider value={state}>
+      <FilterActionsContext.Provider value={actions}>
+        {children}
+      </FilterActionsContext.Provider>
+    </FilterStateContext.Provider>
   );
 };
 
 export const useFilter = () => {
-  const context = useContext(FilterContext);
-  if (context === undefined) {
+  const state = useContext(FilterStateContext);
+  const actions = useContext(FilterActionsContext);
+
+  if (state === undefined || actions === undefined) {
     throw new Error("useFilter must be used within a FilterProvider");
+  }
+
+  return { ...state, ...actions };
+};
+
+export const useFilterState = () => {
+  const context = useContext(FilterStateContext);
+  if (context === undefined) {
+    throw new Error("useFilterState must be used within a FilterProvider");
+  }
+  return context;
+};
+
+export const useFilterActions = () => {
+  const context = useContext(FilterActionsContext);
+  if (context === undefined) {
+    throw new Error("useFilterActions must be used within a FilterProvider");
   }
   return context;
 };

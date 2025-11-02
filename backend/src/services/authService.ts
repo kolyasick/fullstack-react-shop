@@ -97,7 +97,12 @@ export const loginUser = async (
   });
 
   return {
-    user: { id: user.id, username: user.username, email: user.email },
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      uuid: user.uuid,
+    },
     accessToken: tokens.accessToken,
   };
 };

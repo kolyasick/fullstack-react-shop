@@ -3,6 +3,7 @@ import api from "../../../axios/config";
 import React from "react";
 import { useUserStore } from "../../../stores/user";
 import { useNavigate } from "react-router";
+import { useCartStore } from "../../../stores/cart";
 
 type Form = {
   email: string;
@@ -19,6 +20,7 @@ const LoginForm = () => {
     mode: "onBlur",
   });
   const { setUser } = useUserStore();
+  const { fetchCart } = useCartStore();
 
   const [authError, setAuthError] = React.useState<null | string>(null);
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -35,6 +37,7 @@ const LoginForm = () => {
       if (authData.accessToken) {
         localStorage.setItem("e-shopToken", authData.accessToken);
         setUser(authData.user);
+        fetchCart(authData.user.id);
         await navigate("/");
       }
     } catch (error: any) {

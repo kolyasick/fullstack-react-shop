@@ -10,7 +10,7 @@ type ProductQuery = {
   rating: string;
 };
 
-export const findAll = async (query: ProductQuery) => {
+export const findAll = async (query: ProductQuery, userId: number | null) => {
   const { brand, category, priceFrom, priceTo, q, rating, stock } = query;
 
   const brands = brand ? brand.split(", ") : [];
@@ -58,6 +58,20 @@ export const findAll = async (query: ProductQuery) => {
     include: {
       brand: true,
       category: true,
+      cartItem: userId
+        ? {
+            where: {
+              cart: {
+                user: {
+                  id: userId,
+                },
+              },
+            },
+            select: {
+              qty: true,
+            },
+          }
+        : undefined,
       _count: {
         select: {
           reviews: true,
@@ -70,6 +84,10 @@ export const findAll = async (query: ProductQuery) => {
     products.map((p) => ({
       ...p,
       reviewsCount: p._count.reviews,
+      qtyInCart: p.cartItem?.qty || 0,
+
+      cartItem: undefined,
+      _count: undefined,
     })) || []
   );
 };

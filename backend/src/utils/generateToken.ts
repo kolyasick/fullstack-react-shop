@@ -5,7 +5,7 @@ const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET!;
 
 export const generateTokens = (payload: { id: number }) => {
   const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "1h",
   });
 
   const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, {

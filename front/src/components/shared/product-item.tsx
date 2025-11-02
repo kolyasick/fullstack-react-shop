@@ -85,12 +85,14 @@ const ProductItem: React.FC<Props> = ({ product }) => {
             </span>
           </div>
 
-          {false ? (
+          {product.qtyInCart > 0 ? (
             <div className="flex items-center border border-gray-300 rounded-lg">
               <button className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100">
                 −
               </button>
-              <span className="w-8 text-center text-sm">0</span>
+              <span className="w-8 text-center text-sm">
+                {product.qtyInCart}
+              </span>
               <button className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100">
                 +
               </button>

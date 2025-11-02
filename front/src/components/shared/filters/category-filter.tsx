@@ -1,4 +1,5 @@
 import type { Category } from "../../../types/product";
+import Skeleton from "../skeleton";
 import CategoryFilterItem from "./category-filter-item";
 
 type Props = {
@@ -16,14 +17,18 @@ const CategoryFilter: React.FC<Props> = ({
     <div className="mb-6">
       <h4 className="font-medium mb-3">Категории</h4>
       <div className="space-y-2">
-        {categories.map((c) => (
-          <CategoryFilterItem
-            key={c.id}
-            category={c}
-            checked={selectedCategory === c.title}
-            setCategory={setCategory}
-          />
-        ))}
+        {categories.length > 0
+          ? categories.map((c) => (
+              <CategoryFilterItem
+                key={c.id}
+                category={c}
+                checked={selectedCategory === c.title}
+                setCategory={setCategory}
+              />
+            ))
+          : Array.from({ length: 7 }).map((_, i) => (
+              <Skeleton key={i} height={25} width={120} animation="wave" />
+            ))}
       </div>
     </div>
   );

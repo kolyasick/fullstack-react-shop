@@ -24,4 +24,5 @@ export type Product = {
   brand?: Brand;
   category?: Category;
   reviewsCount: number;
+  qtyInCart: number;
 };

@@ -21,7 +21,7 @@ model User {
   password String
   role     Roles
 
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   createdAt DateTime @default(now())
 
   refreshToken RefreshToken[]
@@ -72,7 +72,7 @@ model CartItem {
   id          Int     @id @default(autoincrement())
   qty         Int     @default(1)
 
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   createdAt DateTime @default(now())
 
   productId   Int     @unique   
@@ -85,10 +85,6 @@ model CartItem {
 model Cart {
   id          Int     @id @default(autoincrement())
   amount      Float
-  email       String
-  fullName    String
-  comment     String?
-  
   userId      Int     @unique
 
   user        User   @relation(fields: [userId], references: [id])
@@ -114,7 +110,7 @@ model Review {
   rate Int    @db.SmallInt
   text String
 
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   createdAt DateTime @default(now())
 
   userId    Int

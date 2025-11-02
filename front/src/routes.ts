@@ -1,17 +1,26 @@
 import { createBrowserRouter, redirect } from "react-router";
-import DefaultLayout from "./components/layouts/default";
+
 import IndexPage from "./routes/index";
 import LoginPage from "./routes/(auth)/login";
 import RegisterPage from "./routes/(auth)/register";
 import { ACCESS_TOKEN_NAME } from "./constants/app";
+import App from "./App";
+import NotFoundPage from "./routes/not-found";
 
 const router = createBrowserRouter([
   {
-    Component: DefaultLayout,
+    Component: App,
+    children: [
+      { index: true, Component: IndexPage },
+      { path: "*", Component: NotFoundPage },
+    ],
+  },
+  {
+    Component: App,
     children: [{ index: true, Component: IndexPage }],
   },
   {
-    Component: DefaultLayout,
+    Component: App,
     path: "/login",
     children: [
       {
@@ -22,7 +31,7 @@ const router = createBrowserRouter([
     ],
   },
   {
-    Component: DefaultLayout,
+    Component: App,
     path: "/register",
     children: [
       {
