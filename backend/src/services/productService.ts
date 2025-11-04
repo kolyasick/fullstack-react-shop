@@ -1,7 +1,7 @@
 import prisma from "../lib/prisma";
 
 type ProductQuery = {
-  q: string;
+  searchQuery: string;
   brand: string;
   category: string;
   priceFrom: string;
@@ -11,14 +11,15 @@ type ProductQuery = {
 };
 
 export const findAll = async (query: ProductQuery, userId: number | null) => {
-  const { brand, category, priceFrom, priceTo, q, rating, stock } = query;
+  const { brand, category, priceFrom, priceTo, searchQuery, rating, stock } =
+    query;
 
   const brands = brand ? brand.split(", ") : [];
 
   const products = await prisma.product.findMany({
     where: {
       title: {
-        contains: q || "",
+        contains: searchQuery || "",
         mode: "insensitive",
       },
       brand:

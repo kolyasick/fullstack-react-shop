@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { ACCESS_TOKEN_NAME, API_URL } from "../constants/app";
+import { ACCESS_TOKEN_NAME, API_URL } from "../constants/variables";
 
 declare module "axios" {
   interface InternalAxiosRequestConfig {
@@ -9,7 +9,7 @@ declare module "axios" {
 }
 
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: API_URL,
   timeout: 10000,
   withCredentials: true,
 });

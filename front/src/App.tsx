@@ -1,13 +1,9 @@
 import { Outlet, useLocation } from "react-router";
-import { useCartStore } from "./stores/cart";
-import { FilterProvider } from "./contexts/use-filters";
-import Header from "./components/shared/header";
-import Hero from "./components/shared/hero";
-import Footer from "./components/shared/footer";
-import { useUserStore } from "./stores/user";
+import { useCartStore, useUserStore } from "./stores";
 import { useEffect } from "react";
-import api from "./axios/config";
-import Cart from "./components/shared/cart/cart";
+import { FilterProvider } from "./contexts/filters/use-filters.context";
+import { Cart, Footer, Header, Hero } from "./components";
+import { getProfile } from "./api/auth";
 
 const App = () => {
   const { pathname } = useLocation();
@@ -15,20 +11,10 @@ const App = () => {
   const { setUser, setIsLoading } = useUserStore();
 
   useEffect(() => {
-    const token = localStorage.getItem("e-shopToken");
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
-
     const getUserData = async () => {
       try {
         setIsLoading(true);
-        const { data: userData } = await api.get("/profile", {
-          headers: {
-            Authorization: "Bearer " + token,
-          },
-        });
+        const { data: userData } = await getProfile();
         await fetchCart(userData.user.id);
         setUser(userData.user);
       } catch (error) {

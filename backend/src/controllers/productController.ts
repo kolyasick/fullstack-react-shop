@@ -9,7 +9,7 @@ import {
 } from "../services/productService";
 
 type ProductQuery = {
-  q: string;
+  searchQuery: string;
   brand: string;
   category: string;
   priceFrom: string;

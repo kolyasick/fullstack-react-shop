@@ -1,4 +1,4 @@
-const Hero = () => {
+export const Hero = () => {
   return (
     <section className="bg-linear-to-r from-blue-600 to-purple-700 text-white py-24">
       <div className="container mx-auto px-4 text-center">
@@ -12,5 +12,3 @@ const Hero = () => {
     </section>
   );
 };
-
-export default Hero;

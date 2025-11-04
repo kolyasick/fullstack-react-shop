@@ -1,11 +1,10 @@
 import { createBrowserRouter, redirect } from "react-router";
-
+import App from "./App";
 import IndexPage from "./routes/index";
+import NotFoundPage from "./routes/not-found";
 import LoginPage from "./routes/(auth)/login";
 import RegisterPage from "./routes/(auth)/register";
-import { ACCESS_TOKEN_NAME } from "./constants/app";
-import App from "./App";
-import NotFoundPage from "./routes/not-found";
+import { ACCESS_TOKEN_NAME } from "./constants/variables";
 
 const router = createBrowserRouter([
   {

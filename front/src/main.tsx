@@ -1,9 +1,7 @@
-
 import ReactDOM from "react-dom/client";
-import "./assets/main.css";
+import "../assets/styles/main.css";
 import { RouterProvider } from "react-router";
 import router from "./routes";
-
 
 const rootElement = document.getElementById("root")!;
 

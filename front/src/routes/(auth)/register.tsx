@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import RegisterForm from "../../components/shared/auth/register-form";
+import { RegisterForm } from "../../components";
 
 function RegisterPage() {
   return (

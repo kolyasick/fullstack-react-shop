@@ -1,7 +1,6 @@
 import { create } from "zustand";
-import type { Cart, CartProduct } from "../types/cart";
-import api from "../axios/config";
-import { ACCESS_TOKEN_NAME } from "../constants/app";
+import type { Cart, CartProduct } from "../models/cart/api";
+import { getCart } from "../api/cart";
 
 type CartStore = {
   isOpen: boolean;
@@ -23,14 +22,9 @@ export const useCartStore = create<CartStore>((set) => ({
     set((state) => ({
       cart: state.cart ? { ...state.cart, items: cartItems } : null,
     })),
-  
+
   fetchCart: async (userId) => {
-    const token = localStorage.getItem(ACCESS_TOKEN_NAME);
-    const { data: cart } = await api.get(`/cart/${userId}`, {
-      headers: {
-        Authorization: token ? "Bearer " + token : undefined,
-      },
-    });
+    const { data: cart } = await getCart(userId);
     set(() => ({ cart }));
   },
 }));
