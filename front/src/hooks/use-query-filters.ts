@@ -13,19 +13,26 @@ export const useQueryFilters = (filters: FiltersState) => {
         ...filters,
         priceFrom: filters.priceRange.priceFrom,
         priceTo: filters.priceRange.priceTo,
-        brand: Array.from(filters.selectedBrands).join(", "),
+        brand: Array.from(filters.selectedBrands).join(","),
 
         priceRange: undefined,
       };
+      const cleanedParams = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => {
+          if (value === "") return false;
+          return true;
+        })
+      );
 
-      const query = qs.stringify(params, {
+      const query = qs.stringify(cleanedParams, {
         arrayFormat: "comma",
+        skipNulls: true,
+        allowEmptyArrays: false,
       });
 
       navigate(`?${query}`, {
         replace: true,
       });
-
     }
 
     isMounted.current = true;

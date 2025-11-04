@@ -22,8 +22,8 @@ export const FilterActionsContext = createContext<FilterActions | undefined>(
 );
 
 export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
-  const location = useLocation();
-  const urlParams = new URLSearchParams(location.search);
+  const { search } = useLocation();
+  const urlParams = new URLSearchParams(search);
 
   const [searchQuery, setSearchQuery] = useState(
     urlParams.get("searchQuery") || ""
@@ -34,21 +34,21 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
   const [selectedBrands, { toggle: setBrand, clear: clearSelectedBrands }] =
     useSet(
       new Set<Brand["title"]>(
-        Array.from(urlParams.get("brand")?.split(", ") || [])
+        Array.from(urlParams.get("brand")?.split(",") || [])
       )
     );
   const [priceRange, setPriceRange] = useState<PriceRange>({
     priceFrom: Number(urlParams.get("priceFrom") || 0),
     priceTo: Number(urlParams.get("priceTo") || 1000),
   });
-  const [stock, setStock] = useState<Stock>(
+  const [stock, setStock] = useState<Stock | null>(
     (urlParams.get("stock") as Stock) || "ALL"
   );
-  const [rating, setRating] = useState<number>(
-    Number(urlParams.get("rating") || 1)
+  const [rating, setRating] = useState<number | null>(
+    Number(urlParams.get("rating")) || null
   );
 
-  const updatePriceRange = (key: keyof PriceRange, value: number) => {
+  const updatePriceRange = (key: keyof PriceRange, value: number | null) => {
     setPriceRange((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -57,11 +57,11 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
     setCategory("");
     clearSelectedBrands();
     setPriceRange({
-      priceFrom: 0,
-      priceTo: 1000,
+      priceFrom: null,
+      priceTo: null,
     });
-    setStock("ALL");
-    setRating(1);
+    setStock(null);
+    setRating(null);
   };
 
   const state = useMemo(

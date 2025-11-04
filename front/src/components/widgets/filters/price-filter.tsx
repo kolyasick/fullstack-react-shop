@@ -13,14 +13,14 @@ export const PriceFilter: React.FC<Props> = ({ priceRange, setPriceRange }) => {
         <input
           type="number"
           onChange={(e) => setPriceRange("priceFrom", e.target.valueAsNumber)}
-          value={priceRange.priceFrom}
+          value={priceRange.priceFrom || 0}
           placeholder="От"
           className="w-1/2 px-2 py-1 border border-gray-300 rounded text-sm"
         />
         <input
           type="number"
           onChange={(e) => setPriceRange("priceTo", e.target.valueAsNumber)}
-          value={priceRange.priceTo}
+          value={priceRange.priceTo || 0}
           placeholder="До"
           className="w-1/2 px-2 py-1 border border-gray-300 rounded text-sm"
         />

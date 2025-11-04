@@ -1,6 +1,6 @@
 export type PriceRange = {
-  priceFrom?: number;
-  priceTo?: number;
+  priceFrom: number | null;
+  priceTo: number | null;
 };
 
 export type Stock = "STOCK" | "OUT_OF_STOCK" | "ALL";
@@ -14,17 +14,17 @@ export type FiltersState = {
   category: string;
   selectedBrands: Set<string>;
   priceRange: PriceRange;
-  stock: Stock;
-  rating: number;
+  stock: Stock | null;
+  rating: number | null;
   searchQuery: string;
 };
 
-export type FilterActions =  {
-  updatePriceRange: (key: keyof PriceRange, value: number) => void;
+export type FilterActions = {
+  updatePriceRange: (key: keyof PriceRange, value: number | null) => void;
   setCategory: React.Dispatch<React.SetStateAction<string>>;
-  setStock: React.Dispatch<React.SetStateAction<Stock>>;
-  setRating: React.Dispatch<React.SetStateAction<number>>;
+  setStock: React.Dispatch<React.SetStateAction<Stock | null>>;
+  setRating: React.Dispatch<React.SetStateAction<number | null>>;
   clearFilters: () => void;
   setBrand: (key: string) => void;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
-}
+};
