@@ -17,6 +17,7 @@ export type FiltersState = {
   stock: Stock | null;
   rating: number | null;
   searchQuery: string;
+  page: string | null;
 };
 
 export type FilterActions = {
@@ -27,4 +28,5 @@ export type FilterActions = {
   clearFilters: () => void;
   setBrand: (key: string) => void;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  setPage: React.Dispatch<React.SetStateAction<string | null>>;
 };

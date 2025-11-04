@@ -8,13 +8,34 @@ type ProductQuery = {
   priceTo: string;
   stock: "ALL" | "OUT_OF_STOCK" | "STOCK";
   rating: string;
+  page: string;
+};
+
+const PAGE_SIZE = 6;
+
+const getOffset = (pageLimit?: string) => {
+  const limit = Number(pageLimit) || 0;
+
+  if (limit > 1) {
+    return PAGE_SIZE * (limit - 1);
+  }
+
+  return 0;
 };
 
 export const findAll = async (query: ProductQuery, userId: number | null) => {
-  const { brand, category, priceFrom, priceTo, searchQuery, rating, stock } =
-    query;
+  const {
+    brand,
+    category,
+    priceFrom,
+    priceTo,
+    searchQuery,
+    rating,
+    stock,
+    page,
+  } = query;
 
-  const brands = brand ? brand.split(", ") : [];
+  const brands = brand ? brand.split(",") : [];
 
   const products = await prisma.product.findMany({
     where: {
@@ -55,7 +76,6 @@ export const findAll = async (query: ProductQuery, userId: number | null) => {
           : false
         : undefined,
     },
-
     include: {
       brand: true,
       category: true,
@@ -79,18 +99,67 @@ export const findAll = async (query: ProductQuery, userId: number | null) => {
         },
       },
     },
+    take: PAGE_SIZE,
+    skip: getOffset(page),
   });
 
-  return (
-    products.map((p) => ({
-      ...p,
-      reviewsCount: p._count.reviews,
-      qtyInCart: p.cartItem?.qty || 0,
+  const totalCount = await prisma.product.count({
+    where: {
+      title: {
+        contains: searchQuery || "",
+        mode: "insensitive",
+      },
+      brand:
+        brands.length > 0
+          ? {
+              title: {
+                in: brands,
+              },
+            }
+          : undefined,
+      category: category
+        ? {
+            title: category,
+          }
+        : undefined,
+      price:
+        priceFrom && priceTo
+          ? {
+              lte: Number(priceTo),
+              gte: Number(priceFrom),
+            }
+          : undefined,
+      rating: rating
+        ? {
+            gte: Number(rating),
+          }
+        : undefined,
+      inStock: stock
+        ? stock === "ALL"
+          ? undefined
+          : stock === "STOCK"
+          ? true
+          : false
+        : undefined,
+    },
+  });
 
-      cartItem: undefined,
-      _count: undefined,
-    })) || []
-  );
+  const transformedProducts = products.map((p) => ({
+    ...p,
+    reviewsCount: p._count.reviews,
+    qtyInCart: p.cartItem?.qty || 0,
+    cartItem: undefined,
+    _count: undefined,
+  }));
+
+  return {
+    products: transformedProducts,
+    totalCount,
+    pageSize: PAGE_SIZE,
+    currentPage: Number(page) || 1,
+    totalPages: Math.ceil(totalCount / PAGE_SIZE),
+    hasMore: getOffset(page) + PAGE_SIZE < totalCount,
+  };
 };
 
 export const findBrands = async () => {

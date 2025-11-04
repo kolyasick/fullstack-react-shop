@@ -25,6 +25,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
   const { search } = useLocation();
   const urlParams = new URLSearchParams(search);
 
+  const [page, setPage] = useState(urlParams.get("page") || null);
   const [searchQuery, setSearchQuery] = useState(
     urlParams.get("searchQuery") || ""
   );
@@ -62,6 +63,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
     });
     setStock(null);
     setRating(null);
+    setPage(null);
   };
 
   const state = useMemo(
@@ -72,8 +74,9 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
       stock,
       rating,
       searchQuery,
+      page,
     }),
-    [category, selectedBrands, priceRange, stock, rating, searchQuery]
+    [category, selectedBrands, priceRange, stock, rating, searchQuery, page]
   );
 
   const actions = useMemo(
@@ -85,6 +88,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
       clearFilters,
       setBrand,
       setSearchQuery,
+      setPage,
     }),
     []
   );

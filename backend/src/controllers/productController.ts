@@ -16,6 +16,7 @@ type ProductQuery = {
   priceTo: string;
   stock: "ALL" | "OUT_OF_STOCK" | "STOCK";
   rating: string;
+  page: string;
 };
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -23,7 +24,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
     let userId: number | null = null;
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       userId = null;
     } else {

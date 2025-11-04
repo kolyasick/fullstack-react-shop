@@ -1,11 +1,11 @@
 import api from "../axios/config";
 import { ACCESS_TOKEN_NAME } from "../constants/variables";
-import type { Brand, Category, Product } from "../models/product/api";
+import type { Brand, Category, ProductResponse } from "../models/product/api";
 
 export function getProducts(queryString?: string) {
   const token = localStorage.getItem(ACCESS_TOKEN_NAME);
 
-  return api.get<Product[]>(`/products${queryString}`, {
+  return api.get<ProductResponse>(`/products${queryString}`, {
     headers: {
       Authorization: token ? "Bearer " + token : undefined,
     },

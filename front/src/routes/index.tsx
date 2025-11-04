@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useProductStore, useUserStore } from "../stores";
 
-import type { Brand, Category } from "../models/product/api";
+import type { Brand, Category, ProductResponse } from "../models/product/api";
 
 import { EmptyProducts, Filters, ProductItem, Skeleton } from "../components";
 import { getBrands, getCategories, getProducts } from "../api/product";
 import { useLocation } from "react-router";
+import { Paggination } from "../components/shared/paggination";
 
 const IndexPage: React.FunctionComponent = () => {
   const { products } = useProductStore();
@@ -19,6 +20,11 @@ const IndexPage: React.FunctionComponent = () => {
 
   const path = useLocation();
 
+  const [pagginationInfo, setPagginationInfo] = useState<Omit<
+    ProductResponse,
+    "products"
+  > | null>(null);
+
   useEffect(() => {
     if (isUserLoading) return;
 
@@ -27,7 +33,17 @@ const IndexPage: React.FunctionComponent = () => {
         setLoading(true);
         const { data } = await getProducts(path.search);
 
-        if (data) setProducts(data);
+        if (data) {
+          setProducts(data.products);
+
+          setPagginationInfo({
+            currentPage: data.currentPage,
+            hasMore: data.hasMore,
+            totalCount: data.totalCount,
+            totalPages: data.totalPages,
+            pageSize: data.pageSize,
+          });
+        }
       } catch (error) {
         console.log(error);
       } finally {
@@ -63,7 +79,7 @@ const IndexPage: React.FunctionComponent = () => {
 
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 ">
-              {Array.from({ length: 9 }).map((_, i) => (
+              {Array.from({ length: 6 }).map((_, i) => (
                 <Skeleton key={i} animation="wave" height={400} />
               ))}
             </div>
@@ -75,6 +91,16 @@ const IndexPage: React.FunctionComponent = () => {
             </div>
           ) : (
             <EmptyProducts />
+          )}
+
+          {pagginationInfo && (
+            <Paggination
+              currentPage={pagginationInfo.currentPage}
+              hasMore={pagginationInfo.hasMore}
+              totalCount={pagginationInfo.totalCount}
+              totalPages={pagginationInfo.totalPages}
+              pageSize={pagginationInfo.pageSize}
+            />
           )}
         </div>
       </div>

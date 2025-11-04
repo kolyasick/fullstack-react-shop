@@ -14,9 +14,10 @@ export const useQueryFilters = (filters: FiltersState) => {
         priceFrom: filters.priceRange.priceFrom,
         priceTo: filters.priceRange.priceTo,
         brand: Array.from(filters.selectedBrands).join(","),
-
+        page: filters.page,
         priceRange: undefined,
       };
+
       const cleanedParams = Object.fromEntries(
         Object.entries(params).filter(([_, value]) => {
           if (value === "") return false;
@@ -32,9 +33,9 @@ export const useQueryFilters = (filters: FiltersState) => {
 
       navigate(`?${query}`, {
         replace: true,
+        preventScrollReset: false,
       });
     }
-
     isMounted.current = true;
   }, [filters]);
 };

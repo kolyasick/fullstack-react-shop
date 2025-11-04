@@ -1,3 +1,5 @@
+import type { Paggination } from "../../types/paggination";
+
 export type Brand = {
   id: number;
   title: string;
@@ -26,3 +28,5 @@ export type Product = {
   reviewsCount: number;
   qtyInCart: number;
 };
+
+export type ProductResponse = Paggination & { products: Product[] };
