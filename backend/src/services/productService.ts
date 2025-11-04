@@ -147,7 +147,7 @@ export const findAll = async (query: ProductQuery, userId: number | null) => {
   const transformedProducts = products.map((p) => ({
     ...p,
     reviewsCount: p._count.reviews,
-    qtyInCart: p.cartItem?.qty || 0,
+    qtyInCart: (p.cartItem && p.cartItem[0]?.qty) || 0,
     cartItem: undefined,
     _count: undefined,
   }));

@@ -25,7 +25,7 @@ export const getProfile = async (req: Request, res: Response) => {
       return sendError(res, 404, "Пользователь не найден");
     }
 
-    res.status(200).json({ user });
+    res.status(200).json(user);
   } catch (error: any) {
     sendError(res, 500, error.message || "Внутренняя ошибка сервера");
   }

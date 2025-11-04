@@ -1,6 +1,7 @@
 import api from "../axios/config";
 import { ACCESS_TOKEN_NAME } from "../constants/variables";
 import type {
+  User,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
@@ -24,7 +25,7 @@ export function register(data: RegisterRequest) {
 
 export function getProfile() {
   const token = localStorage.getItem(ACCESS_TOKEN_NAME);
-  return api.get("/profile", {
+  return api.get<User>("/profile", {
     headers: {
       Authorization: "Bearer " + token,
     },

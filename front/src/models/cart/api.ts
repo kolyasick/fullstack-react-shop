@@ -5,7 +5,7 @@ export type Cart = {
   amount: number;
   userId: number;
 
-  itemsLength: number;
+  length: number;
   items: CartProduct[];
 };
 

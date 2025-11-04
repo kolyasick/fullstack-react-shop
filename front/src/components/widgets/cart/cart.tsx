@@ -1,9 +1,25 @@
+import { useEffect } from "react";
 import { useCartStore } from "../../../stores/cart";
 import { CartItem } from "./cart-item";
-
+import { getCart } from "../../../api/cart";
+import { useUserStore } from "../../../stores";
+import { formatCurrency } from "../../../utils/formatCurrency";
 
 export const Cart: React.FC = () => {
-  const { toggleCart, cart } = useCartStore();
+  const { toggleCart, setCart, cart } = useCartStore();
+  const { user } = useUserStore();
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const { data } = await getCart(user!.uuid, false);
+        setCart(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCartItems();
+  }, []);
 
   return (
     <>
@@ -33,7 +49,7 @@ export const Cart: React.FC = () => {
           </div>
           {cart?.items && cart.items.length > 0 && (
             <p className="text-gray-500 text-sm mt-1">
-              {cart.items.length} товара на сумму {cart.amount}
+              {cart.length} товара на сумму {formatCurrency(cart.amount)}
             </p>
           )}
         </div>
@@ -68,7 +84,7 @@ export const Cart: React.FC = () => {
               <span className="text-gray-600">
                 {/* Товары ({cart && cart.items.length}) */}
               </span>
-              <span className="text-gray-900">{cart?.amount}</span>
+              <span className="text-gray-900">{formatCurrency(cart?.amount || 0)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Скидка</span>
@@ -86,7 +102,7 @@ export const Cart: React.FC = () => {
             <span className="text-lg font-bold text-gray-900">Итого</span>
             <span className="text-2xl font-bold text-gray-900">
               {/* {formatCurrency(totalAmount() - totalDiscount())} */}
-              {cart?.amount} - 10
+              {formatCurrency(cart?.amount || 0)}
             </span>
           </div>
 
@@ -103,5 +119,3 @@ export const Cart: React.FC = () => {
     </>
   );
 };
-
-

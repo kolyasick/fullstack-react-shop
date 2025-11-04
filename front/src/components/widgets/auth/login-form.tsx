@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useCartStore, useUserStore } from "../../../stores";
 import { useState } from "react";
 import { login } from "../../../api/auth";
+import { ACCESS_TOKEN_NAME } from "../../../constants/variables";
 
 type Form = {
   email: string;
@@ -34,9 +35,9 @@ export const LoginForm = () => {
       });
 
       if (authData.accessToken) {
-        localStorage.setItem("e-shopToken", authData.accessToken);
+        localStorage.setItem(ACCESS_TOKEN_NAME, authData.accessToken);
         setUser(authData.user);
-        fetchCart(authData.user.id);
+        fetchCart(authData.user.uuid, true);
         await navigate("/");
       }
     } catch (error: any) {

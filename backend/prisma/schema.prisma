@@ -65,30 +65,41 @@ model Product {
   category Category @relation(fields: [categoryId], references: [id])
   brand    Brand    @relation(fields: [brandId], references: [id])
   reviews  Review[]
-  cartItem  CartItem?
+  cartItem  CartItem[]
+
+  @@index([id,uuid])
 }
 
 model CartItem {
   id          Int     @id @default(autoincrement())
+
   qty         Int     @default(1)
 
   updatedAt DateTime @updatedAt @default(now())
   createdAt DateTime @default(now())
 
-  productId   Int     @unique   
+  productId   Int     
   cartId      Int     
 
   product     Product @relation(fields: [productId],references: [id])
   cart        Cart    @relation(fields: [cartId], references: [id])
+
+  @@unique([cartId, productId])
+
+  @@index([id])
 }
 
 model Cart {
   id          Int     @id @default(autoincrement())
+  uuid     String @unique @default(uuid()) @db.Uuid
+
   amount      Float
   userId      Int     @unique
 
   user        User   @relation(fields: [userId], references: [id])
   items       CartItem[]
+
+  @@index([id,uuid])
 }
 
 model Category {
@@ -96,6 +107,8 @@ model Category {
   title String @unique
 
   products Product[]
+
+  @@index([id])
 }
 
 model Brand {
@@ -103,6 +116,7 @@ model Brand {
   title String @unique
 
   products Product[]
+  @@index([id])
 }
 
 model Review {
@@ -118,4 +132,6 @@ model Review {
 
   author  User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])
+
+  @@index([id])
 }

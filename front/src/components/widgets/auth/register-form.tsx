@@ -2,10 +2,9 @@ import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { useCartStore, useUserStore } from "../../../stores";
-import api from "../../../axios/config";
 import { ACCESS_TOKEN_NAME } from "../../../constants/variables";
 import { register } from "../../../api/auth";
-import { initalizeCart } from "../../../api/cart";
+
 
 type Form = {
   username: string;
@@ -29,7 +28,7 @@ export const RegisterForm = () => {
   const [authError, setAuthError] = useState<null | string>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { setUser } = useUserStore();
-  const { setCart } = useCartStore();
+  const { fetchCart } = useCartStore();
   const onSubmit: SubmitHandler<Form> = async (data) => {
     try {
       setAuthError(null);
@@ -44,8 +43,7 @@ export const RegisterForm = () => {
         localStorage.setItem(ACCESS_TOKEN_NAME, authData.accessToken);
         setUser(authData.user);
 
-        const { data: cart } = await initalizeCart();
-        setCart(cart);
+        fetchCart(authData.user.uuid, true);
         await navigate("/");
       }
     } catch (error: any) {
