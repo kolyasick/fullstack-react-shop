@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Product } from "../models/product";
+import type { Product } from "../models/product/api";
 
 type ProductStore = {
   products: Product[];

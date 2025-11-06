@@ -19,8 +19,7 @@ export const LoginForm = () => {
   } = useForm<Form>({
     mode: "onBlur",
   });
-  const { setUser } = useUserStore();
-  const { fetchCart } = useCartStore();
+  const setUser = useUserStore((state) => state.setUser);
 
   const [authError, setAuthError] = useState<null | string>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -37,7 +36,6 @@ export const LoginForm = () => {
       if (authData.accessToken) {
         localStorage.setItem(ACCESS_TOKEN_NAME, authData.accessToken);
         setUser(authData.user);
-        fetchCart(authData.user.uuid, true);
         await navigate("/");
       }
     } catch (error: any) {

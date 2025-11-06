@@ -101,11 +101,7 @@ export const add = async (cartId: string, productId: number) => {
         },
       },
       include: {
-        product: {
-          select: {
-            price: true,
-          },
-        },
+        product: true,
       },
     });
   } else {
@@ -115,11 +111,7 @@ export const add = async (cartId: string, productId: number) => {
         cartId: Number(cartId),
       },
       include: {
-        product: {
-          select: {
-            price: true,
-          },
-        },
+        product: true,
       },
     });
   }
@@ -183,6 +175,8 @@ export const remove = async (
         product: true,
       },
     });
+    deletedItem.qty = 0;
+    console.log(deletedItem);
   } else {
     deletedItem = await prisma.cartItem.update({
       where: {

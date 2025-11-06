@@ -1,4 +1,10 @@
-import React, { createContext, useMemo, useState, type ReactNode } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import type {
   FilterActions,
   FiltersState,
@@ -90,7 +96,16 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
       setSearchQuery,
       setPage,
     }),
-    []
+    [
+      updatePriceRange,
+      setCategory,
+      setStock,
+      setRating,
+      clearFilters,
+      setBrand,
+      setSearchQuery,
+      setPage,
+    ]
   );
 
   return (

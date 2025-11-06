@@ -1,5 +1,5 @@
 import type { Brand } from "../../../models/product/api";
-import { BrandFilterItem, Skeleton } from "../../../components";
+import { BrandFilterItem, FilterSkeleton } from "../../../components";
 
 type Props = {
   brands: Brand[];
@@ -27,7 +27,7 @@ export const BrandFilter: React.FC<Props> = ({
       ) : (
         <div className="space-y-2">
           {Array.from({ length: 7 }).map((_, i) => (
-            <Skeleton key={i} width={120} height={25} />
+            <FilterSkeleton key={i} />
           ))}
         </div>
       )}

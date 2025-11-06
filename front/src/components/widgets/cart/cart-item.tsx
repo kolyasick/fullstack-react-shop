@@ -1,43 +1,14 @@
+import { useCartActions } from "../../../hooks";
 import type { CartProduct } from "../../../models/cart/api";
-import { useCartStore, useProductStore } from "../../../stores";
 import { formatCurrency } from "../../../utils/formatCurrency";
+import { ProductCounter } from "../../shared";
 
 type Props = {
   cartItem: CartProduct;
 };
 
 export const CartItem: React.FC<Props> = ({ cartItem }) => {
-  const { addToCart: addProductToCart, removeFromCart: removeProductFromCart } =
-    useCartStore();
-  const { setProducts, products } = useProductStore();
-  const addToCart = async (productId: number) => {
-    try {
-      await addProductToCart(productId);
-      setProducts(
-        products.map((p) =>
-          p.id === productId ? { ...p, qtyInCart: p.qtyInCart + 1 } : p
-        )
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const removeFromCart = async (productId: number, completely: boolean) => {
-    try {
-      await removeProductFromCart(productId, completely);
-
-      setProducts(
-        products.map((p) =>
-          p.id === productId
-            ? { ...p, qtyInCart: completely ? 0 : p.qtyInCart - 1 }
-            : p
-        )
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const { removeFromCart } = useCartActions();
 
   return (
     <div className="flex gap-4 pb-4 border-b border-gray-100">
@@ -54,21 +25,7 @@ export const CartItem: React.FC<Props> = ({ cartItem }) => {
         </h3>
         <p className="text-gray-500 text-sm">{cartItem.product.brand?.title}</p>
         <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center border border-gray-300 rounded-lg">
-            <button
-              onClick={() => removeFromCart(cartItem.productId, false)}
-              className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100"
-            >
-              −
-            </button>
-            <span className="w-8 text-center text-sm">{cartItem.qty}</span>
-            <button
-              onClick={() => addToCart(cartItem.productId)}
-              className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100"
-            >
-              +
-            </button>
-          </div>
+          <ProductCounter productId={cartItem.productId} qty={cartItem.qty} />
           <span className="font-semibold text-gray-900">
             {formatCurrency(cartItem.product.price)}
           </span>

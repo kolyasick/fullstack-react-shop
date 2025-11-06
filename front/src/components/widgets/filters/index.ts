@@ -1,3 +1,5 @@
+export { FilterSkeleton } from "./skeleton";
+
 export { BrandFilter } from "./brand-filter";
 export { BrandFilterItem } from "./brand-filter-item";
 export { CategoryFilter } from "./category-filter";

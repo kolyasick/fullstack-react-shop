@@ -5,7 +5,6 @@ import { useCartStore, useUserStore } from "../../../stores";
 import { ACCESS_TOKEN_NAME } from "../../../constants/variables";
 import { register } from "../../../api/auth";
 
-
 type Form = {
   username: string;
   email: string;
@@ -23,12 +22,12 @@ export const RegisterForm = () => {
     mode: "onBlur",
   });
 
+  const setUser = useUserStore((state) => state.setUser);
+  
   const navigate = useNavigate();
 
   const [authError, setAuthError] = useState<null | string>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const { setUser } = useUserStore();
-  const { fetchCart } = useCartStore();
   const onSubmit: SubmitHandler<Form> = async (data) => {
     try {
       setAuthError(null);
@@ -43,7 +42,6 @@ export const RegisterForm = () => {
         localStorage.setItem(ACCESS_TOKEN_NAME, authData.accessToken);
         setUser(authData.user);
 
-        fetchCart(authData.user.uuid, true);
         await navigate("/");
       }
     } catch (error: any) {

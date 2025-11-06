@@ -1,4 +1,4 @@
-import { CategoryFilterItem, Skeleton } from "../../../components";
+import { CategoryFilterItem, FilterSkeleton } from "../../../components";
 import type { Category } from "../../../models/product/api";
 
 type Props = {
@@ -25,9 +25,7 @@ export const CategoryFilter: React.FC<Props> = ({
                 setCategory={setCategory}
               />
             ))
-          : Array.from({ length: 7 }).map((_, i) => (
-              <Skeleton key={i} height={25} width={120} animation="wave" />
-            ))}
+          : Array.from({ length: 7 }).map((_, i) => <FilterSkeleton key={i} />)}
       </div>
     </div>
   );

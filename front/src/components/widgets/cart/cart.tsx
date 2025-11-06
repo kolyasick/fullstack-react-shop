@@ -1,25 +1,33 @@
 import { useEffect } from "react";
-import { useCartStore } from "../../../stores/cart";
 import { CartItem } from "./cart-item";
 import { getCart } from "../../../api/cart";
-import { useUserStore } from "../../../stores";
+import { useUserStore, useCartStore } from "../../../stores";
 import { formatCurrency } from "../../../utils/formatCurrency";
+import { useQuery } from "@tanstack/react-query";
 
 export const Cart: React.FC = () => {
-  const { toggleCart, setCart, cart } = useCartStore();
-  const { user } = useUserStore();
+  const cart = useCartStore((state) => state.cart);
+  const setCart = useCartStore((state) => state.setCart);
+  const toggleCart = useCartStore((state) => state.toggleCart);
+  const user = useUserStore((state) => state.user);
 
-  useEffect(() => {
-    const fetchCartItems = async () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["cart", user?.uuid], 
+    queryFn: async () => {
       try {
         const { data } = await getCart(user!.uuid, false);
-        setCart(data);
+        return data;
       } catch (error) {
         console.log(error);
       }
-    };
-    fetchCartItems();
-  }, []);
+    },
+    enabled: !!user?.uuid,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  useEffect(() => {
+    if (data) setCart(data);
+  }, [data]);
 
   return (
     <>
@@ -84,7 +92,9 @@ export const Cart: React.FC = () => {
               <span className="text-gray-600">
                 {/* Товары ({cart && cart.items.length}) */}
               </span>
-              <span className="text-gray-900">{formatCurrency(cart?.amount || 0)}</span>
+              <span className="text-gray-900">
+                {formatCurrency(cart?.amount || 0)}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Скидка</span>

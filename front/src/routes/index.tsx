@@ -1,68 +1,84 @@
 import { useEffect, useState } from "react";
 import { useProductStore, useUserStore } from "../stores";
-
-import type { Brand, Category, ProductResponse } from "../models/product/api";
-
-import { EmptyProducts, Filters, ProductItem, Skeleton } from "../components";
+import type { Brand, Category } from "../models/product/api";
+import {
+  EmptyProducts,
+  Filters,
+  ProductItem,
+  ProductSkeleton,
+} from "../components";
 import { getBrands, getCategories, getProducts } from "../api/product";
 import { useLocation } from "react-router";
 import { Paggination } from "../components/shared/paggination";
+import { useQueries } from "@tanstack/react-query";
+import { usePaginationState } from "../hooks";
 
-const IndexPage: React.FunctionComponent = () => {
-  const { products } = useProductStore();
+const IndexPage: React.FC = () => {
+  const user = useUserStore((state) => state.user);
+  const isUserLoading = useUserStore((state) => state.isLoading);
+
+  const products = useProductStore((state) => state.products);
+  const setProducts = useProductStore((state) => state.setProducts);
+
+  const { pagginationInfo, setPaginationInfo } = usePaginationState();
 
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
-  const [loading, setLoading] = useState(true);
-  const { setProducts } = useProductStore();
-  const { isLoading: isUserLoading, user } = useUserStore();
-
   const path = useLocation();
 
-  const [pagginationInfo, setPagginationInfo] = useState<Omit<
-    ProductResponse,
-    "products"
-  > | null>(null);
+  const [brandsQuery, categoriesQuery, productsQuery] = useQueries({
+    queries: [
+      {
+        queryKey: ["brands"],
+        queryFn: async () => {
+          const { data } = await getBrands();
+          return data || [];
+        },
+        staleTime: 24 * 60 * 60 * 1000,
+      },
+      {
+        queryKey: ["categories"],
+        queryFn: async () => {
+          const { data } = await getCategories();
+          return data || [];
+        },
+        staleTime: 24 * 60 * 60 * 1000,
+      },
+      {
+        queryKey: ["products", path.search, user?.id],
+        queryFn: async () => {
+          const { data } = await getProducts(path.search);
+          return data;
+        },
+        staleTime: 5 * 60 * 1000,
+        enabled: !isUserLoading,
+      },
+    ],
+  });
 
   useEffect(() => {
-    if (isUserLoading) return;
-
-    const getFilteredProducts = async () => {
-      try {
-        setLoading(true);
-        const { data } = await getProducts(path.search);
-
-        if (data) {
-          setProducts(data.products);
-
-          setPagginationInfo({
-            currentPage: data.currentPage,
-            hasMore: data.hasMore,
-            totalCount: data.totalCount,
-            totalPages: data.totalPages,
-            pageSize: data.pageSize,
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getFilteredProducts();
-  }, [isUserLoading, path.search, user]);
+    if (productsQuery.data) {
+      setProducts(productsQuery.data.products);
+      setPaginationInfo({
+        currentPage: productsQuery.data.currentPage,
+        hasMore: productsQuery.data.hasMore,
+        totalCount: productsQuery.data.totalCount,
+        totalPages: productsQuery.data.totalPages,
+        pageSize: productsQuery.data.pageSize,
+      });
+    }
+  }, [productsQuery.data, setProducts]);
 
   useEffect(() => {
-    const findBrands = () => {
-      getBrands().then((res) => setBrands(res.data));
-    };
-    const findCategories = () => {
-      getCategories().then((res) => setCategories(res.data));
-    };
-    Promise.all([findBrands(), findCategories()]);
-  }, []);
+    if (brandsQuery.data) setBrands(brandsQuery.data);
+    if (categoriesQuery.data) setCategories(categoriesQuery.data);
+  }, [brandsQuery.data, categoriesQuery.data]);
+
+  const isLoading =
+    brandsQuery.isLoading ||
+    categoriesQuery.isLoading ||
+    productsQuery.isLoading;
 
   return (
     <div
@@ -76,10 +92,10 @@ const IndexPage: React.FunctionComponent = () => {
           <h3 className="text-3xl font-bold text-gray-900">Товары</h3>
         </div>
 
-        {loading ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} animation="wave" height={400} />
+              <ProductSkeleton className="w-full" key={i} />
             ))}
           </div>
         ) : products.length > 0 ? (
