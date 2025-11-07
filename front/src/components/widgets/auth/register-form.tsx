@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { FormProvider, useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { useCartStore, useUserStore } from "../../../stores";
+import { useUserStore } from "../../../stores";
 import { ACCESS_TOKEN_NAME } from "../../../constants/variables";
 import { register } from "../../../api/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { formRegisterSchema } from "./schemas";
+import { Button, Input } from "../../shared";
 
 type Form = {
   username: string;
@@ -13,17 +16,19 @@ type Form = {
 };
 
 export const RegisterForm = () => {
-  const {
-    register: registerValue,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<Form>({
+  const form = useForm({
+    resolver: zodResolver(formRegisterSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      passwordRepeat: "",
+    },
     mode: "onBlur",
   });
 
   const setUser = useUserStore((state) => state.setUser);
-  
+
   const navigate = useNavigate();
 
   const [authError, setAuthError] = useState<null | string>(null);
@@ -52,146 +57,42 @@ export const RegisterForm = () => {
     }
   };
 
-  const watchPassword = watch("password");
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div>
-        <label
-          htmlFor="username"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Имя
-        </label>
-        <div className="mt-1">
-          <input
-            {...registerValue("username", {
-              required: "Имя обязательно для заполнения",
-              minLength: {
-                value: 2,
-                message: "Имя должно содержать минимум 2 символа",
-              },
-              maxLength: {
-                value: 20,
-                message: "Имя не должно превышать 20 символов",
-              },
-              pattern: {
-                value: /^[a-zA-Zа-яА-ЯёЁ\s]+$/,
-                message: "Имя может содержать только буквы и пробелы",
-              },
-            })}
-            id="username"
-            type="text"
-            className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-              errors.username ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Введите ваше имя"
-          />
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <Input
+          name="username"
+          label="Имя"
+          type="text"
+          placeholder="Введите ваше имя"
+        />
+        <Input
+          name="email"
+          label="E-mail"
+          type="email"
+          placeholder="Введите вашу почту"
+        />
+        <Input
+          name="password"
+          label="Пароль"
+          type="password"
+          placeholder="Введите пароль"
+        />
+        <Input
+          name="passwordRepeat"
+          label="Подтверждение пароля"
+          type="password"
+          placeholder="Повторите введенный пароль"
+        />
+        <div>
+          <Button loading={loading} type="submit">
+            Зарегистрироваться
+          </Button>
+          {authError && (
+            <p className="mt-1 text-sm text-red-600">{authError}</p>
+          )}
         </div>
-        {errors.username && (
-          <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-gray-700"
-        >
-          E-mail
-        </label>
-        <div className="mt-1">
-          <input
-            {...registerValue("email", {
-              required: "E-mail обязателен для заполнения",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Введите корректный e-mail адрес",
-              },
-            })}
-            id="email"
-            type="email"
-            className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-              errors.email ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Введите ваш e-mail"
-          />
-        </div>
-        {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Пароль
-        </label>
-        <div className="mt-1">
-          <input
-            {...registerValue("password", {
-              required: "Пароль обязателен для заполнения",
-              minLength: {
-                value: 6,
-                message: "Пароль должен содержать минимум 6 символов",
-              },
-            })}
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-              errors.password ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Введите пароль"
-          />
-        </div>
-        {errors.password && (
-          <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label
-          htmlFor="passwordRepeat"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Повтор пароля
-        </label>
-        <div className="mt-1">
-          <input
-            {...registerValue("passwordRepeat", {
-              required: "Повторите пароль",
-              validate: (value) =>
-                value === watchPassword || "Пароли не совпадают",
-            })}
-            id="passwordRepeat"
-            type="password"
-            autoComplete="new-password"
-            className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-              errors.passwordRepeat ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Повторите пароль"
-          />
-        </div>
-        {errors.passwordRepeat && (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.passwordRepeat.message}
-          </p>
-        )}
-      </div>
-
-      <div>
-        <button
-          type="submit"
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:pointer-events-none"
-          disabled={Object.keys(errors).length > 0}
-        >
-          {loading ? "Загрузка..." : "Зарегистрироваться"}
-        </button>
-        {authError && <p className="mt-1 text-sm text-red-600">{authError}</p>}
-      </div>
-    </form>
+      </form>
+    </FormProvider>
   );
 };

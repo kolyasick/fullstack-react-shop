@@ -4,7 +4,6 @@ import { sendError } from "../utils/sendError";
 
 export const getCart = async (req: Request, res: Response) => {
   try {
-    console.log(req.params);
     const { userId } = req.params as {
       userId: string;
     };

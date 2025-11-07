@@ -21,11 +21,12 @@ model User {
   password String
   role     Roles
 
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
   createdAt DateTime @default(now())
 
   refreshToken RefreshToken[]
   reviews      Review[]
+  orders       Order[]
   cart         Cart?
 
   @@index([id])
@@ -58,48 +59,62 @@ model Product {
   inStock     Boolean
   features    String
 
-
   brandId    Int
   categoryId Int
 
-  category Category @relation(fields: [categoryId], references: [id])
-  brand    Brand    @relation(fields: [brandId], references: [id])
+  category Category   @relation(fields: [categoryId], references: [id])
+  brand    Brand      @relation(fields: [brandId], references: [id])
   reviews  Review[]
-  cartItem  CartItem[]
+  cartItem CartItem[]
 
-  @@index([id,uuid])
+  @@index([id, uuid])
 }
 
 model CartItem {
-  id          Int     @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  qty         Int     @default(1)
+  qty Int @default(1)
 
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
   createdAt DateTime @default(now())
 
-  productId   Int     
-  cartId      Int     
+  productId Int
+  cartId    Int
 
-  product     Product @relation(fields: [productId],references: [id])
-  cart        Cart    @relation(fields: [cartId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  cart    Cart    @relation(fields: [cartId], references: [id])
 
   @@unique([cartId, productId])
-
   @@index([id])
 }
 
 model Cart {
-  id          Int     @id @default(autoincrement())
-  uuid     String @unique @default(uuid()) @db.Uuid
+  id     Int     @id @default(autoincrement())
+  uuid   String  @unique @default(uuid()) @db.Uuid
+  token  String?
+  amount Float
+  userId Int     @unique
 
-  amount      Float
-  userId      Int     @unique
+  user  User       @relation(fields: [userId], references: [id])
+  items CartItem[]
+  order Order[]
 
-  user        User   @relation(fields: [userId], references: [id])
-  items       CartItem[]
+  @@index([id, uuid])
+}
 
-  @@index([id,uuid])
+model Order {
+  id       String  @unique @default(uuid()) @db.Uuid
+  email    String
+  username String
+  comment  String?
+  cartId   Int
+  userId   Int
+
+  updatedAt DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  cart Cart @relation(fields: [cartId], references: [id])
 }
 
 model Category {
@@ -116,6 +131,7 @@ model Brand {
   title String @unique
 
   products Product[]
+
   @@index([id])
 }
 
@@ -124,7 +140,7 @@ model Review {
   rate Int    @db.SmallInt
   text String
 
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
   createdAt DateTime @default(now())
 
   userId    Int

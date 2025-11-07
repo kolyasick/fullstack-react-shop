@@ -2,8 +2,10 @@ import { Outlet, useLocation } from "react-router";
 import { useCartStore } from "./stores";
 import { FilterProvider } from "./contexts/filters/use-filters.context";
 import { Cart, Footer, Header, Hero } from "./components";
-
 import { useAuthInitialie } from "./hooks";
+import { v4 as uuid } from "uuid";
+import { useEffect } from "react";
+import { CART_TOKEN_NAME } from "./constants/variables";
 
 const App = () => {
   useAuthInitialie();
@@ -11,6 +13,11 @@ const App = () => {
 
   const { pathname } = useLocation();
 
+  useEffect(() => {
+    const isTokenExist = localStorage.getItem(CART_TOKEN_NAME);
+
+    if (!isTokenExist) localStorage.setItem(CART_TOKEN_NAME, uuid());
+  }, []);
   return (
     <FilterProvider>
       <div className="min-h-screen bg-white flex flex-col">

@@ -20,5 +20,5 @@
 button,
 a,
 label {
-  @apply cursor-pointer;
+  @apply cursor-pointer disabled:opacity-60 disabled:pointer-events-none;
 }

@@ -10,6 +10,16 @@ export type Category = {
   title: string;
 };
 
+export type Review = {
+  id: number;
+  rate: number;
+  text: string;
+  updatedAt: Date;
+  createdAt: Date;
+  userId: number;
+  productId: number;
+};
+
 export type Product = {
   id: number;
   uuid: string;
@@ -27,6 +37,10 @@ export type Product = {
   category?: Category;
   reviewsCount: number;
   qtyInCart: number;
+};
+
+export type ProductWithReview = Omit<Product, "reviewsCount"> & {
+  reviews: Review[];
 };
 
 export type ProductResponse = Paggination & { products: Product[] };

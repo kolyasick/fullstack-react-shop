@@ -1,3 +1,6 @@
+export { Input } from './input';
+export { Button } from './button';
+
 export { ProductCounter } from './product-counter';
 export { HeaderSkeleton } from "./header-skeleton";
 

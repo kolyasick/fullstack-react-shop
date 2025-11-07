@@ -162,6 +162,52 @@ export const findAll = async (query: ProductQuery, userId: number | null) => {
   };
 };
 
+export const findById = async (id: string, userId: number | null) => {
+  try {
+    const product = await prisma.product.findFirst({
+      where: {
+        uuid: id,
+      },
+      include: {
+        brand: true,
+        category: true,
+        reviews: {
+          select: {
+            author: {
+              select: {
+                username: true,
+                email: true,
+                uuid: true,
+              },
+            },
+          },
+        },
+        cartItem: userId
+          ? {
+              where: {
+                cart: {
+                  user: {
+                    id: userId,
+                  },
+                },
+              },
+              select: {
+                qty: true,
+              },
+            }
+          : undefined,
+      },
+    });
+
+    return {
+      ...product,
+      qtyInCart: (product?.cartItem && product?.cartItem[0]?.qty) || 0,
+    };
+  } catch (error) {
+    return null;
+  }
+};
+
 export const findBrands = async () => {
   const brands = await prisma.brand.findMany();
 

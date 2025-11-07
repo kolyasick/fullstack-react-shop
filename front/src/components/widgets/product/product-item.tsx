@@ -16,10 +16,14 @@ export const ProductItem: React.FC<Props> = ({ product }) => {
   return (
     <div className="bg-white flex flex-col justify-between rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
       <div>
-        <Link to="/" className="relative overflow-hidden block">
+        <Link
+          to={"/product/" + product.uuid}
+          className="relative overflow-hidden block"
+        >
           <img
+            style={{ background: "url(/loader.svg) no-repeat center" }}
             src={`/products/${product.imageUrl}`}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 border border-transparent"
           />
 
           {product.inStock ? (

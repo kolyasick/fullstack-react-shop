@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCartStore } from "../stores";
-import type { Product } from "../models/product/api";
+import type { Product, ProductWithReview } from "../models/product/api";
 import type { Cart, CartProduct } from "../models/cart/api";
 
 export const useCartActions = () => {
@@ -71,12 +71,26 @@ export const useCartActions = () => {
     });
   };
 
+  const updateProductCache = (productId: number, product: CartProduct) => {
+    queryClient.setQueryData(
+      ["product", product.product.uuid],
+      (oldData: ProductWithReview) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          qtyInCart: product.qty,
+        };
+      }
+    );
+  };
+
   const addToCart = async (productId: number) => {
     if (!cart?.id) return;
     try {
       const product = await addProductToCart(productId);
       updateAllProductsCache(productId, product.qty);
       updateAllCartCache(product);
+      updateProductCache(productId, product);
     } catch (error) {
       console.log(error);
     }
@@ -89,6 +103,7 @@ export const useCartActions = () => {
 
       updateAllProductsCache(productId, product.qty);
       updateAllCartCache(product);
+      updateProductCache(productId, product);
     } catch (error) {
       console.log(error);
     }

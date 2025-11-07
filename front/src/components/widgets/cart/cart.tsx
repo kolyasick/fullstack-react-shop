@@ -4,6 +4,9 @@ import { getCart } from "../../../api/cart";
 import { useUserStore, useCartStore } from "../../../stores";
 import { formatCurrency } from "../../../utils/formatCurrency";
 import { useQuery } from "@tanstack/react-query";
+import { CartSkeleton } from "./skeleton";
+import { PromocodeForm } from "./promocode-form";
+import { CartInfo } from "./cart-info";
 
 export const Cart: React.FC = () => {
   const cart = useCartStore((state) => state.cart);
@@ -12,7 +15,7 @@ export const Cart: React.FC = () => {
   const user = useUserStore((state) => state.user);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["cart", user?.uuid], 
+    queryKey: ["cart", user?.uuid, cart?.items],
     queryFn: async () => {
       try {
         const { data } = await getCart(user!.uuid, false);
@@ -21,7 +24,8 @@ export const Cart: React.FC = () => {
         console.log(error);
       }
     },
-    enabled: !!user?.uuid,
+    enabled: !!user?.uuid && !cart?.items,
+
     staleTime: 5 * 60 * 1000,
   });
 
@@ -62,69 +66,31 @@ export const Cart: React.FC = () => {
           )}
         </div>
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {cart?.items &&
-            cart.items.length > 0 &&
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <CartSkeleton key={i} className="w-full" />
+            ))
+          ) : cart?.items && cart.items.length > 0 ? (
             cart.items.map((cartItem) => (
               <CartItem cartItem={cartItem} key={cartItem.id} />
-            ))}
+            ))
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center ">
+              <div className="text-6xl mb-4">😔</div>
+              <div className="text-2xl text-gray-600 mb-2">Корзина пуста</div>
+              <button
+                onClick={() => toggleCart(false)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Набрать товаров
+              </button>
+            </div>
+          )}
         </div>
 
-        <div
-          className={`p-6 border-t border-gray-200 ${
-            false ? "opacity-60 pointer-events-none" : ""
-          }`}
-        >
-          <div className="flex gap-2 mb-4">
-            <input
-              type="text"
-              placeholder="Промокод"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">
-              Применить
-            </button>
-          </div>
-        </div>
+        <PromocodeForm />
 
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <div className="space-y-3 mb-6">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">
-                {/* Товары ({cart && cart.items.length}) */}
-              </span>
-              <span className="text-gray-900">
-                {formatCurrency(cart?.amount || 0)}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Скидка</span>
-              <span className="text-green-600">
-                {/* −{formatCurrency(totalDiscount())} */}0
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Доставка</span>
-              <span className="text-gray-900">Бесплатно</span>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center mb-6 pt-4 border-t border-gray-200">
-            <span className="text-lg font-bold text-gray-900">Итого</span>
-            <span className="text-2xl font-bold text-gray-900">
-              {/* {formatCurrency(totalAmount() - totalDiscount())} */}
-              {formatCurrency(cart?.amount || 0)}
-            </span>
-          </div>
-
-          <button className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg shadow-lg">
-            Оформить заказ
-          </button>
-
-          <p className="text-center text-gray-500 text-xs mt-3">
-            Нажимая на кнопку, вы соглашаетесь с условиями обработки
-            персональных данных
-          </p>
-        </div>
+        <CartInfo amount={cart?.amount || 0} length={cart?.length || 0} />
       </div>
     </>
   );

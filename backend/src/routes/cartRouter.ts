@@ -8,11 +8,11 @@ import { authenticate } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-router.get("/:userId", authenticate, getCart);
-router.post("/:cartId/products/add", authenticate, addProductToCart);
+router.get("/:userId", getCart);
+router.post("/:cartId/products/add", addProductToCart);
 router.delete(
   "/:cartId/products/:productId/remove",
-  authenticate,
+
   removeFromCart
 );
 

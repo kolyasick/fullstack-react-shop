@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import {
   findAll,
   findBrands,
+  findById,
   findCategories,
 } from "../services/productService";
 
@@ -45,6 +46,35 @@ export const getProducts = async (req: Request, res: Response) => {
     res.status(200).json(products);
   } catch (error: any) {
     console.log(error);
+    sendError(res, 500, error.message || "Внутренняя ошибка сервера");
+  }
+};
+
+export const getProductById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    let userId: number | null = null;
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      userId = null;
+    } else {
+      const token = authHeader.split(" ")[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
+        id: number;
+      };
+      userId = decoded.id;
+    }
+
+    const product = await findById(id, userId);
+
+    if (!product) {
+      return sendError(res, 404, "Товар не найден");
+    }
+
+    res.status(200).json(product);
+  } catch (error: any) {
     sendError(res, 500, error.message || "Внутренняя ошибка сервера");
   }
 };

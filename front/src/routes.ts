@@ -1,10 +1,13 @@
-import { createBrowserRouter, redirect } from "react-router";
+import { createBrowserRouter, redirect, useParams } from "react-router";
 import App from "./App";
 import IndexPage from "./routes/index";
 import NotFoundPage from "./routes/not-found";
 import LoginPage from "./routes/(auth)/login";
 import RegisterPage from "./routes/(auth)/register";
 import { ACCESS_TOKEN_NAME } from "./constants/variables";
+import { ProductPage } from "./routes/product/[id]";
+import { OrderPage } from "./routes/order/[id]";
+import { CreateOrderPage } from "./routes/order";
 
 const router = createBrowserRouter([
   {
@@ -20,12 +23,37 @@ const router = createBrowserRouter([
   },
   {
     Component: App,
+    path: "/product/:id",
+    children: [
+      {
+        index: true,
+        Component: ProductPage,
+      },
+    ],
+  },
+  {
+    path: "/order",
+    Component: App,
+    loader: needAuth,
+    children: [
+      {
+        index: true,
+        Component: CreateOrderPage,
+      },
+      {
+        path: ":id",
+        Component: OrderPage,
+      },
+    ],
+  },
+  {
+    Component: App,
     path: "/login",
     children: [
       {
         index: true,
         Component: LoginPage,
-        loader: authLoader,
+        loader: hasAuth,
       },
     ],
   },
@@ -36,16 +64,24 @@ const router = createBrowserRouter([
       {
         index: true,
         Component: RegisterPage,
-        loader: authLoader,
+        loader: hasAuth,
       },
     ],
   },
 ]);
 
-async function authLoader() {
+async function hasAuth() {
   const token = localStorage.getItem(ACCESS_TOKEN_NAME);
 
   if (token) {
+    throw redirect("/");
+  }
+}
+
+async function needAuth() {
+  const token = localStorage.getItem(ACCESS_TOKEN_NAME);
+
+  if (!token) {
     throw redirect("/");
   }
 }
